@@ -9,13 +9,24 @@ fun main() {
             val yourMove = Thing.getThing(you)
 
             score += Thing.getRoundResultScore(opponentMove, yourMove)
-            score += Thing.getThing(you).points
+            score += yourMove.points
         }
         return score
     }
 
     fun part2(input: List<String>): Int {
-        return 0
+        var score = 0
+        input.forEach { line ->
+            val lineWithoutWhiteSpaces = line.filter { !it.isWhitespace() }
+            val opponent = lineWithoutWhiteSpaces[0].toString()
+            val endingResult = lineWithoutWhiteSpaces[1].toString()
+            val opponentMove = Thing.getThing(opponent)
+            val yourMove = Thing.getThingInCaseOfEndingResult(opponentMove, endingResult)
+
+            score += Thing.getRoundResultScore(opponentMove, yourMove)
+            score += yourMove.points
+        }
+        return score
     }
 
     val input = readInput("Day02")
@@ -37,7 +48,19 @@ enum class Thing(val points: Int) {
                 "C", "Z" -> SCISSORS
                 else -> SCISSORS
             }
+        }
 
+        fun getThingInCaseOfEndingResult(opponentThing: Thing, endingResult: String): Thing {
+            return when {
+                endingResult == "Y" -> opponentThing
+                opponentThing == ROCK && endingResult == "X" -> SCISSORS
+                opponentThing == ROCK && endingResult == "Z" -> PAPER
+                opponentThing == PAPER && endingResult == "X" -> ROCK
+                opponentThing == PAPER && endingResult == "Z" -> SCISSORS
+                opponentThing == SCISSORS && endingResult == "X" -> PAPER
+                opponentThing == SCISSORS && endingResult == "Z" -> ROCK
+                else -> SCISSORS
+            }
         }
 
         fun getRoundResultScore(opponentMove: Thing, yourMove: Thing): Int {
